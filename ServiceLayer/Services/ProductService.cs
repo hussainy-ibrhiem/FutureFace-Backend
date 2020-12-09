@@ -57,7 +57,7 @@ namespace ServiceLayer.Services
 
         public async Task<PageList<ProductDto>> GetAll(ProductSearchDto productSearchDto)
         {
-            PageList<ProductDto> pageList = null;
+            PageList<ProductDto> pageList = new PageList<ProductDto>() ;
             Expression<Func<Product, bool>> filter = e => string.IsNullOrWhiteSpace(e.Name) || e.Name.Contains(productSearchDto.Name);
             List<Product> products = new List<Product>();
             products = productSearchDto.SortingModel.SortingExpression switch
@@ -73,7 +73,7 @@ namespace ServiceLayer.Services
                     {
                         Id = p.Id,
                         Name = p.Name,
-                        Photo = configuration["ImagePath"] + p.Photo,
+                        Photo = p.Photo,
                         Price = p.Price,
                         LastUpdated = p.LastUpdated
                     }).ToList(),
