@@ -62,6 +62,8 @@ namespace Task
 
             app.UseHttpsRedirection();
 
+            app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseAuthorization();
@@ -71,7 +73,7 @@ namespace Task
                 endpoints.MapControllers();
             });
             app.UseSwagger();
-            app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "Product API"));
+            app.UseSwaggerUI(options => options.SwaggerEndpoint(Configuration["SwaggerSettings:URL"], Configuration["SwaggerSettings:Names"]));
         }
     }
 }

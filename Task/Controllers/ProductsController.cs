@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -16,11 +17,13 @@ namespace Task.Controllers
     {
         private readonly IProductService _productService;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductsController(IProductService productService,IConfiguration configuration)
+        public ProductsController(IProductService productService,IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
         {
             _productService = productService;
             _configuration = configuration;
+            _webHostEnvironment = webHostEnvironment;
         }
         [HttpPost]
         public async Task<ActionResult<bool>> AddProduct(AddEditProductInputDto addEditProductInputDto)
@@ -71,8 +74,8 @@ namespace Task.Controllers
         public async Task<ActionResult<UploadResponse>> UploadImage()
         {
             var file = Request.Form.Files[0];
-            string result = await _productService.SaveFileAsync(file, _configuration["ImagePath"]);
-            UploadResponse uploadResponse = new UploadResponse { Url = _configuration["ImagePath"], FileName = result };
+            string result = await _productService.SaveFileAsync(file, _webHostEnvironment.WebRootPath);
+            UploadResponse uploadResponse = new UploadResponse { Url = _webHostEnvironment.WebRootPath+"\\", FileName = result };
             return Ok(uploadResponse);
         }
     }
