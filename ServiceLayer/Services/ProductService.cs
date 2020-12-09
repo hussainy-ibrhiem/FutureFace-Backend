@@ -1,6 +1,7 @@
 ﻿using Data.Models;
 using Data.Repositories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using ServiceLayer.Dtos;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,12 @@ namespace ServiceLayer.Services
     public class ProductService : IProductService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IConfiguration configuration;
 
-        public ProductService(IUnitOfWork unitOfWork)
+        public ProductService(IUnitOfWork unitOfWork, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
+            this.configuration = configuration;
         }
         public async Task<bool> AddProduct(AddEditProductInputDto addEditProductInputDto)
         {
@@ -70,7 +73,7 @@ namespace ServiceLayer.Services
                     {
                         Id = p.Id,
                         Name = p.Name,
-                        Photo = p.Photo,
+                        Photo = configuration["ImagePath"] + p.Photo,
                         Price = p.Price,
                         LastUpdated = p.LastUpdated
                     }).ToList(),

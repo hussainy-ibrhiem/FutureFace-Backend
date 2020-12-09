@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using ServiceLayer.Dtos;
 using ServiceLayer.Services;
 
@@ -14,10 +15,12 @@ namespace Task.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly IConfiguration _configuration;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductService productService,IConfiguration configuration)
         {
             _productService = productService;
+            _configuration = configuration;
         }
         [HttpPost]
         public async Task<ActionResult<bool>> AddProduct(AddEditProductInputDto addEditProductInputDto)
@@ -68,8 +71,8 @@ namespace Task.Controllers
         public async Task<ActionResult<UploadResponse>> UploadImage()
         {
             var file = Request.Form.Files[0];
-            string result = await _productService.SaveFileAsync(file, @"C:\Users\PugsFighter\Desktop\E-Vision Task\FrontEnd\E-Vision-Task\src\assets\images");
-            UploadResponse uploadResponse = new UploadResponse { Url =@"C:\Users\PugsFighter\Desktop\E-Vision Task\FrontEnd\E-Vision-Task\src\assets\images", FileName = result };
+            string result = await _productService.SaveFileAsync(file, _configuration["ImagePath"]);
+            UploadResponse uploadResponse = new UploadResponse { Url = _configuration["ImagePath"], FileName = result };
             return Ok(uploadResponse);
         }
     }
