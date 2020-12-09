@@ -37,9 +37,9 @@ namespace Task
             {
                 options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
                 {
-                    Title = "Product API",
-                    Version = "v1",
-                    Description = "Sample service for Product",
+                    Title = Configuration["SwaggerSettings:Title"],
+                    Version = Configuration["SwaggerSettings:Version"],
+                    Description = Configuration["SwaggerSettings:Description"]
                 });
             });
             services.AddTransient<IProductService, ProductService>();
