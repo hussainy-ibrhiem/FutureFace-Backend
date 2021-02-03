@@ -1,8 +1,5 @@
 ﻿using Data.Context;
 using Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Data.Repositories
@@ -15,6 +12,7 @@ namespace Data.Repositories
             AppDbContext = appContext;
         }
         public IRepository<Product> Product => new Repository<Product>(AppDbContext);
+        public IRepository<Category> Category => new Repository<Category>(AppDbContext);
 
         public Task<int> Commit()
         {

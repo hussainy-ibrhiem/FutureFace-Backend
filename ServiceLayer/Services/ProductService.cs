@@ -34,7 +34,10 @@ namespace ServiceLayer.Services
                     Name = addEditProductInputDto.Name,
                     Photo = addEditProductInputDto.Photo,
                     Price = addEditProductInputDto.Price,
-                    CreationDate = DateTime.Now
+                    CreationDate = DateTime.Now,
+                    Quantity = addEditProductInputDto.Quantity,
+                    CategoryId = addEditProductInputDto.CategoryId,
+                    SubCategoryId = addEditProductInputDto.SubCategoryId
                 };
                 _unitOfWork.Product.CreateAsyn(product);
                 added = await _unitOfWork.Commit() > default(int);
@@ -57,13 +60,13 @@ namespace ServiceLayer.Services
 
         public async Task<PageList<ProductDto>> GetAll(ProductSearchDto productSearchDto)
         {
-            PageList<ProductDto> pageList = new PageList<ProductDto>() ;
+            PageList<ProductDto> pageList = new PageList<ProductDto>();
             Expression<Func<Product, bool>> filter = e => string.IsNullOrWhiteSpace(e.Name) || e.Name.Contains(productSearchDto.Name);
             List<Product> products = new List<Product>();
             products = productSearchDto.SortingModel.SortingExpression switch
             {
-                "Name" => await _unitOfWork.Product.GetPageAsync(productSearchDto.PageNumber, productSearchDto.PageSize, filter, p => p.Name, productSearchDto.SortingModel.SortingDirection),
-                _ => await _unitOfWork.Product.GetPageAsync(productSearchDto.PageNumber, productSearchDto.PageSize, filter, p => p.CreationDate, SortDirectionEnum.Descending),
+                "Name" => await _unitOfWork.Product.GetPageAsync(productSearchDto.PageNumber, productSearchDto.PageSize, filter, p => p.Name, productSearchDto.SortingModel.SortingDirection, "Category"),
+                _ => await _unitOfWork.Product.GetPageAsync(productSearchDto.PageNumber, productSearchDto.PageSize, filter, p => p.CreationDate, SortDirectionEnum.Descending, "Category"),
             };
             if (products?.Any() ?? default)
             {
@@ -75,7 +78,12 @@ namespace ServiceLayer.Services
                         Name = p.Name,
                         Photo = p.Photo,
                         Price = p.Price,
-                        LastUpdated = p.LastUpdated
+                        LastUpdated = p.LastUpdated,
+                        CategoryName = p.Category.Name,
+                        SubCategoryName = GetSubCategoryName(p.SubCategoryId).GetAwaiter().GetResult(),
+                        Quantity = p.Quantity,
+                        CategoryId = p.CategoryId,
+                        SubCategoryId = p.SubCategoryId,
                     }).ToList(),
                     TotalCount = await _unitOfWork.Product.GetCountAsync(filter)
                 };
@@ -86,7 +94,7 @@ namespace ServiceLayer.Services
         public async Task<ProductDto> GetProductById(ProductIDentityDto productIDentityDto)
         {
             ProductDto productDto = null;
-            Product product = await _unitOfWork.Product.FirstOrDefaultAsync(p => p.Id == productIDentityDto.Id);
+            Product product = await _unitOfWork.Product.FirstOrDefaultAsync(p => p.Id == productIDentityDto.Id, "Category");
             if (product != null)
                 productDto = new ProductDto
                 {
@@ -94,9 +102,22 @@ namespace ServiceLayer.Services
                     Name = product.Name,
                     Photo = product.Photo,
                     Price = product.Price,
-                    LastUpdated = product.LastUpdated.GetValueOrDefault()
+                    LastUpdated = product.LastUpdated.GetValueOrDefault(),
+                    CategoryName = product.Category.Name,
+                    SubCategoryName = await GetSubCategoryName(product.SubCategoryId),
+                    Quantity = product.Quantity,
+                    CategoryId = product.CategoryId,
+                    SubCategoryId = product.SubCategoryId,
                 };
             return productDto;
+        }
+
+        private async Task<string> GetSubCategoryName(int? subCategoryId)
+        {
+
+            Category category = await _unitOfWork.Category.FirstOrDefaultAsync(cat => cat.Id == subCategoryId);
+            string name = category != null ? category.Name : "-";
+            return name;
         }
 
         public async Task<bool> UpdateProduct(AddEditProductInputDto addEditProductInputDto)
@@ -114,6 +135,9 @@ namespace ServiceLayer.Services
                     product.Photo = addEditProductInputDto.Photo;
                     product.Price = addEditProductInputDto.Price;
                     product.LastUpdated = DateTime.Now;
+                    product.Quantity = addEditProductInputDto.Quantity;
+                    product.CategoryId = addEditProductInputDto.CategoryId;
+                    product.SubCategoryId = addEditProductInputDto.SubCategoryId;
                     _unitOfWork.Product.Update(product);
                     updated = await _unitOfWork.Commit() > default(int);
                 }

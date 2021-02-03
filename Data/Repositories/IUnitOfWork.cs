@@ -10,5 +10,6 @@ namespace Data.Repositories
     {
         Task<int> Commit();
         IRepository<Product> Product { get; }
+        IRepository<Category> Category { get; }
     }
 }

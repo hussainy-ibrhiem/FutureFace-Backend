@@ -43,6 +43,7 @@ namespace Task
                 });
             });
             services.AddTransient<IProductService, ProductService>();
+            services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {

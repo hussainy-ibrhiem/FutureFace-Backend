@@ -19,7 +19,7 @@ namespace Task.Controllers
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductsController(IProductService productService,IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
+        public ProductsController(IProductService productService, IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
         {
             _productService = productService;
             _configuration = configuration;
@@ -75,7 +75,7 @@ namespace Task.Controllers
         {
             var file = Request.Form.Files[0];
             string result = await _productService.SaveFileAsync(file, _webHostEnvironment.WebRootPath);
-            UploadResponse uploadResponse = new UploadResponse { Url = _webHostEnvironment.WebRootPath+"\\", FileName = result };
+            UploadResponse uploadResponse = new UploadResponse { Url = _webHostEnvironment.WebRootPath + "\\", FileName = _configuration["ImagePath"] + result };
             return Ok(uploadResponse);
         }
     }

@@ -11,5 +11,10 @@ namespace ServiceLayer.Dtos
         public string Photo { get; set; }
         public double Price { get; set; }
         public DateTime? LastUpdated { get; set; }
+        public string CategoryName { get; set; }
+        public string SubCategoryName { get; set; }
+        public int Quantity { get; set; }
+        public int CategoryId { get; set; }
+        public int? SubCategoryId { get; set; }
     }
 }
